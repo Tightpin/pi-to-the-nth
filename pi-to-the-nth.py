@@ -31,7 +31,7 @@ def main():
                 getcontext().prec = places + 1
                 result = nilakantha(ITERATIONS) 
                 print(result)
-                checkResult(places)
+                checkResult(result, places)
                 break
         # Handle ValueError and pass to error message
         except ValueError:
@@ -56,13 +56,23 @@ It's good to check our math against an objective truth. Luckily, Google has accu
 AND they deliver!
 https://pi.delivery/#apipi_get
 """
-def checkResult(end):
+def checkResult(result, places):
+    truepi = fetchPi(places)
+    print('Compare to: ',truepi)
+    checkpi = str(result).replace('.', '')
+    if truepi == checkpi:
+        print ("✅ It appears the math is correct.")
+    else:
+        print ("❌ The two versions of pi do not align - somebodies math is wrong.")
+
+
+def fetchPi(end):
     #API Counts 3 as a digit place, so we add one to compensate
     url = 'https://api.pi.delivery/v1/pi?start=0&numberOfDigits='+str(end+1) 
     call = urllib.request.urlopen(url)
     #After making the call, we use the json library to change it into a python compatible object
     clean = json.loads(call.read().decode('utf-8'))
-    print("Compare to: ",clean['content'])
+    return clean['content']
 
 if __name__ == "__main__":
     main()
