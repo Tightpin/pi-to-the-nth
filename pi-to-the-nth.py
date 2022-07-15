@@ -10,6 +10,10 @@ several seconds to compute. The number of iterations (and the range) can be
 increase within the code's global variables.
 """
 from decimal import Decimal, getcontext
+import urllib.request
+import urllib.parse
+import json
+
 
 ITERATIONS = 1000000    # One million iterations provides 18 decimal-points of accuracy
 RANGE_MAX = 20          # TODO: Find if range can be scaled to ITERATIONS
@@ -26,6 +30,7 @@ def main():
                 getcontext().prec = places + 1
                 result = nilakantha(ITERATIONS) 
                 print(result)
+                checkResult(result, places)
                 break
         # Handle ValueError and pass to error message
         except ValueError:
@@ -44,6 +49,29 @@ def nilakantha(iterations) -> Decimal:
         result += 4 / Decimal(n * (n + 1) * (n + 2) * op)
         op *= -1
     return result
+
+"""
+It's good to check our math against an objective truth. Luckily, Google has accurately calculated pi to a trillion digits
+AND they deliver!
+https://pi.delivery/#apipi_get
+"""
+def checkResult(result, places):
+    truepi = fetchPi(places)
+    print('Compare to: ',truepi)
+    checkpi = str(result).replace('.', '')
+    if truepi == checkpi:
+        print ("✅ It appears the math is correct.")
+    else:
+        print ("❌ The two versions of pi do not align - somebodies math is wrong.")
+
+
+def fetchPi(end):
+    #API Counts 3 as a digit place, so we add one to compensate
+    url = 'https://api.pi.delivery/v1/pi?start=0&numberOfDigits='+str(end+1) 
+    call = urllib.request.urlopen(url)
+    #After making the call, we use the json library to change it into a python compatible object
+    clean = json.loads(call.read().decode('utf-8'))
+    return clean['content']
 
 if __name__ == "__main__":
     main()
