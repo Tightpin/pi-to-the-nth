@@ -10,7 +10,6 @@ several seconds to compute. The number of iterations (and the range) can be
 increase within the code's global variables.
 """
 from decimal import Decimal, getcontext
-from sre_constants import RANGE
 import urllib.request
 import urllib.parse
 import json
